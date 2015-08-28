@@ -3,7 +3,7 @@ package de.cofinpro.dojo.model;
 /**
 * Created by chuff on 28.08.2015.
 */
-class Position {
+public class Position {
     final int x, y;
 
     public Position(int x, int y) {
