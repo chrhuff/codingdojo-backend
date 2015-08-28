@@ -2,27 +2,19 @@ apply plugin: 'war'
 apply plugin: 'java'
 apply plugin: 'idea'
 
-configurations {
-    provided
-}
-
 repositories {
     flatDir { dirs "lib" }
     mavenCentral()
-}
-
-sourceSets {
-    main { compileClasspath += configurations.provided }
 }
 
 dependencies {
 
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.12'
-    provided 'org.jboss.resteasy:resteasy-validator-provider-11:3.0.12.Final'
-    provided 'org.jboss.resteasy:resteasy-jackson2-provider:3.0.12.Final'
-    provided 'org.jboss.resteasy:resteasy-client:3.0.12.Final'
-    compile 'javax.inject:javax.inject:1'
+    providedCompile 'org.jboss.resteasy:resteasy-validator-provider-11:3.0.12.Final'
+    providedCompile 'org.jboss.resteasy:resteasy-jackson2-provider:3.0.12.Final'
+    providedCompile 'org.jboss.resteasy:resteasy-client:3.0.12.Final'
+    providedCompile 'javax.inject:javax.inject:1'
     compile 'junit:junit:4.12'
 
 }
