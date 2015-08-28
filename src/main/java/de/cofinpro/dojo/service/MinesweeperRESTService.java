@@ -26,15 +26,12 @@ public class MinesweeperRESTService {
     private some persistence backend
 */
 
-    @Inject
-    private WsResultValidator wsResultValidator;
-
     @Context
     private SecurityContext securityContext;
 
     @POST
     @Path("/submitAction")
-    public Boolean submitAction( Action action ) {
+    public Boolean submitAction( String action ) {
         return false;
     }
 
