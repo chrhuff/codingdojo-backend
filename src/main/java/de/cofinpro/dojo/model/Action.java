@@ -1,7 +1,5 @@
 package de.cofinpro.dojo.model;
 
-import javax.xml.bind.annotation.XmlEnum;
-
 /**
  * Created by chuff on 28.08.2015.
  */
