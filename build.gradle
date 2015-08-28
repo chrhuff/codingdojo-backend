@@ -2,7 +2,7 @@ apply plugin: 'war'
 apply plugin: 'java'
 
 configurations {
-    moreLibs
+
 }
 
 repositories {
@@ -11,24 +11,16 @@ repositories {
 }
 
 dependencies {
-    compile module(":compile:1.0") {
-        dependency ":compile-transitive-1.0@jar"
-        dependency ":providedCompile-transitive:1.0@jar"
-    }
-    providedCompile "javax.servlet:servlet-api:2.5"
-    providedCompile module(":providedCompile:1.0") {
-        dependency ":providedCompile-transitive:1.0@jar"
-    }
-    runtime ":runtime:1.0"
-    providedRuntime ":providedRuntime:1.0@jar"
-    testCompile "junit:junit:4.12"
-    moreLibs ":otherLib:1.0"
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
+
+    //common dependencies
+    //common "org.slf4j:slf4j-api:1.7.12"
+    //common "org.slf4j:slf4j-log4j12:1.7.12"
+    //common 'log4j:log4j:1.2.14'
+
 }
 
 war {
-    from 'src/rootContent' // adds a file-set to the root of the archive
-    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
-    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
-    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
-    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+    from 'src/main/webapp' // adds a file-set to the root of the archive
 }
