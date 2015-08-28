@@ -1,5 +1,6 @@
 apply plugin: 'war'
 apply plugin: 'java'
+apply plugin: 'idea'
 
 configurations {
     provided
@@ -21,7 +22,7 @@ dependencies {
     provided 'org.jboss.resteasy:resteasy-validator-provider-11:3.0.12.Final'
     provided 'org.jboss.resteasy:resteasy-jackson2-provider:3.0.12.Final'
     provided 'org.jboss.resteasy:resteasy-client:3.0.12.Final'
-    provided 'javax.inject:javax.inject:1'
+    compile 'javax.inject:javax.inject:1'
     compile 'junit:junit:4.12'
 
 }

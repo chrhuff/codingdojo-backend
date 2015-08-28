@@ -32,10 +32,10 @@ public class MinesweeperRESTService {
     @Inject
     private some persistence backend
 */
-
+/*
     @Context
     private SecurityContext securityContext;
-
+*/
     @PUT
     @Path("/submitAction/{sessid}")
     public Collection<VisibleCell> submitAction( @PathParam("sessid") String sessionId, Action action ) {
