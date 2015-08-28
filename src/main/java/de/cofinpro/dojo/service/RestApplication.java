@@ -4,7 +4,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 /**
- * OrderRESTService Application
+ * MinesweeperRESTService Application
  *
  */
 @ApplicationPath("/")
