@@ -48,4 +48,8 @@ public class Cell {
         return -1;
     }
 
+    public void uncover() {
+        state.uncovered = true;
+    }
+
 }

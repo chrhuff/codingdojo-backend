@@ -32,4 +32,11 @@ public class Action {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return "Action{" +
+                "position=" + position +
+                ", type=" + type +
+                '}';
+    }
 }
