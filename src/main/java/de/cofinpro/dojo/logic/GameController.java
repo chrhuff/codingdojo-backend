@@ -112,14 +112,6 @@ public class GameController {
                         throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
                     }
 
-                    LOG.info("Flag action at " + position.toString());
-
-                    if (!selectedCell.isUncovered()) {
-                        selectedCell.toggleFlag();
-                    } else {
-                        throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
-                    }
-
                     break;
                 case SOLVE:
 
