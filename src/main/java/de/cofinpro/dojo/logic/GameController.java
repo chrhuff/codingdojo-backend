@@ -95,6 +95,7 @@ public class GameController {
                     if (!selectedCell.isUncovered()) {
                         if (selectedCell.isMine()) {
                             LOG.error("Game over!");
+                            selectedCell.uncover();
                             status = Minefield.Status.GAMEOVER;
                         } else {
                             LOG.info("Empty cell!");
