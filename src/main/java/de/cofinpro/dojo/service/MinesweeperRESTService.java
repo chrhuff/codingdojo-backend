@@ -37,7 +37,7 @@ public class MinesweeperRESTService {
     private SecurityContext securityContext;
 */
     @PUT
-    @Path("/submitAction/{sessid}")
+    @Path("/{sessid}")
     public ActionResult submitAction( @PathParam("sessid") Integer sessionId, Action action ) {
         try {
             ActionResult result = gameController.submitAction(sessionId, action);
@@ -50,7 +50,6 @@ public class MinesweeperRESTService {
     }
 
     @POST
-    @Path("/initGame")
     public Integer initGame( InitGameRequest request ) {
         try {
             int id = gameController.startGame(request.getWidth(), request.getHeight(), request.getMineRatio());
@@ -64,7 +63,7 @@ public class MinesweeperRESTService {
     }
 
     @GET
-    @Path("/currentGameState/{sessid}")
+    @Path("/{sessid}")
     public ActionResult getCurrentGameState(@PathParam("sessid") Integer sessionId) {
         Action noop = new Action();
         noop.setType(Action.Type.NOOP);
