@@ -278,9 +278,113 @@ public class GameControllerTest {
         ActionResult actionResult = controller.submitAction(sessionId, action);
 
         Assert.assertEquals( Minefield.Status.CONTINUE, actionResult.getStatus() );
-        Assert.assertEquals( 25, actionResult.getVisibleCells().size() );
-        Assert.assertEquals( minefield, controller.getMinefield(sessionId));
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+        Assert.assertEquals(minefield, controller.getMinefield(sessionId));
 
+    }
+
+    @Test
+    public void testSolveAction() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncoverAction = new Action();
+        uncoverAction.setPosition(Position.at(1, 1));
+        uncoverAction.setType(Action.Type.UNCOVER);
+        ActionResult unconverResult = controller.submitAction(sessionId, uncoverAction);
+
+        Action flagAction = new Action();
+        flagAction.setPosition(Position.at(0,0));
+        flagAction.setType(Action.Type.FLAG);
+        ActionResult flagResult = controller.submitAction(sessionId, flagAction);
+
+        LOG.info(flagResult.toString());
+
+        Action action = new Action();
+        action.setPosition(Position.at(1, 1));
+        action.setType(Action.Type.SOLVE);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+
+        VisibleCell[][] cells = new VisibleCell[5][5];
+        for (VisibleCell cell : actionResult.getVisibleCells()) {
+            cells[cell.getX()][cell.getY()] = cell;
+        }
+
+        LOG.info(actionResult.toString());
+        LOG.info(minefield.toString());
+
+        Assert.assertEquals(true, cells[0][0].isFlagged());
+
+        Assert.assertEquals(1, cells[1][0].getNumber());
+        Assert.assertEquals(1, cells[1][1].getNumber());
+        Assert.assertEquals(0, cells[1][2].getNumber());
+
+        Assert.assertEquals(1, cells[0][1].getNumber());
+        Assert.assertEquals(0, cells[0][2].getNumber());
+
+        Assert.assertEquals(0, cells[2][0].getNumber());
+        Assert.assertEquals(1, cells[2][1].getNumber());
+        Assert.assertEquals(1, cells[2][2].getNumber());
+    }
+
+    @Test
+    public void testSolveGameover() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncoverAction = new Action();
+        uncoverAction.setPosition(Position.at(1, 1));
+        uncoverAction.setType(Action.Type.UNCOVER);
+        ActionResult unconverResult = controller.submitAction(sessionId, uncoverAction);
+
+        Action flagAction = new Action();
+        flagAction.setPosition(Position.at(1, 0));
+        flagAction.setType(Action.Type.FLAG);
+        ActionResult flagResult = controller.submitAction(sessionId, flagAction);
+
+        LOG.info(flagResult.toString());
+
+        Action action = new Action();
+        action.setPosition(Position.at(1, 1));
+        action.setType(Action.Type.SOLVE);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+
+        Assert.assertEquals(Minefield.Status.GAMEOVER, actionResult.getStatus());
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+
+        VisibleCell[][] cells = new VisibleCell[5][5];
+        for (VisibleCell cell : actionResult.getVisibleCells()) {
+            cells[cell.getX()][cell.getY()] = cell;
+        }
+
+        LOG.info(actionResult.toString());
+        LOG.info(minefield.toString());
+
+        Assert.assertEquals(Boolean.TRUE, cells[0][0].isMine());
+
+        Assert.assertEquals(-1, cells[1][0].getNumber());
+        Assert.assertEquals(1, cells[1][1].getNumber());
+        Assert.assertEquals(0, cells[1][2].getNumber());
+
+        Assert.assertEquals(1, cells[0][1].getNumber());
+        Assert.assertEquals(0, cells[0][2].getNumber());
+
+        Assert.assertEquals(0, cells[2][0].getNumber());
+        Assert.assertEquals(1, cells[2][1].getNumber());
+        Assert.assertEquals(1, cells[2][2].getNumber());
     }
 
     @AfterClass

@@ -29,7 +29,7 @@ public class VisibleCell {
     }
 
     public Boolean isMine() {
-        if (mineRevealed) {
+        if (mineRevealed || underlyingCell.isUncovered()) {
             return underlyingCell.isMine();
         }
         return null;

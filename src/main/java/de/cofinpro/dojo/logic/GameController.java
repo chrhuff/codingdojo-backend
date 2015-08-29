@@ -112,8 +112,34 @@ public class GameController {
                         throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
                     }
 
+                    LOG.info("Flag action at " + position.toString());
+
+                    if (!selectedCell.isUncovered()) {
+                        selectedCell.toggleFlag();
+                    } else {
+                        throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
+                    }
+
                     break;
                 case SOLVE:
+
+                    LOG.info("Solve action at " + position.toString());
+
+
+                    if (selectedCell.isUncovered()) {
+
+                        try {
+                            Collection<Cell> adjacent = minefield.getAdjacent(selectedCell);
+                            long numberOfFlags = adjacent.stream().filter(c -> c.isFlagged()).count();
+                            if (numberOfFlags == selectedCell.getNumber()) {
+                                adjacent.stream().filter(c -> !c.isUncovered() && !c.isFlagged()).forEach(c -> uncoverCell(minefield, c));
+                            }
+                        } catch (MineUncoveredException e) {
+                            LOG.error(e.getMessage());
+                            status = Minefield.Status.GAMEOVER;
+                        }
+                    }
+
                     break;
             }
         }
@@ -129,13 +155,19 @@ public class GameController {
     private void uncoverCell(Minefield minefield, Cell selectedCell) {
         if (!selectedCell.isUncovered()) {
             selectedCell.uncover();
-            if (selectedCell.getNumber() == 0) {
-                //uncover adjacent cells, now!
-                for (Cell adjacentCell : minefield.getAdjacent(selectedCell)) {
-                    uncoverCell(minefield, adjacentCell);
-                }
-
+            if (selectedCell.isMine()) {
+                throw new MineUncoveredException(selectedCell);
             }
+            if (selectedCell.getNumber() == 0) {
+                //uncover unflagged adjacent cells, now!
+                minefield.getAdjacent(selectedCell).stream().filter(c -> !c.isFlagged()).forEach(c -> uncoverCell(minefield, c));
+            }
+        }
+    }
+
+    private class MineUncoveredException extends RuntimeException {
+        public MineUncoveredException(Cell selectedCell) {
+            super("Mine uncovered at position: " + selectedCell.getX() + ", " + selectedCell.getY());
         }
     }
 }
