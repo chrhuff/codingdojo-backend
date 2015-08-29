@@ -11,6 +11,12 @@ public class Position {
         this.y = y;
     }
 
+    public static Position at(int x, int y) {
+        return new Position(x, y);
+    }
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -35,11 +35,11 @@ public class VisibleCell {
         return null;
     }
 
-    public int getX() {
+    public Integer getX() {
         return underlyingCell.getX();
     }
 
-    public int getY() {
+    public Integer getY() {
         return underlyingCell.getY();
     }
 
