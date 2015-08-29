@@ -39,7 +39,7 @@ public class GameController {
         return sessionId;
     }
 
-    public Integer startGame(int width, int height, List<Position> minePositions) throws InvalidGameSetupException {
+    Integer startGame(int width, int height, List<Position> minePositions) throws InvalidGameSetupException {
         int sessionId = generateSessionId();
 
         int fieldSize = width * height;

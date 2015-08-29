@@ -15,7 +15,18 @@ public class Position {
         return new Position(x, y);
     }
 
+    public Position() {
+        this.x = -1;
+        this.y = -1;
+    }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 
     @Override
     public boolean equals(Object o) {

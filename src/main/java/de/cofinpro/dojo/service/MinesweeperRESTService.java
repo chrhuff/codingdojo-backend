@@ -1,9 +1,9 @@
 package de.cofinpro.dojo.service;
 
-import de.cofinpro.dojo.model.Action;
-import de.cofinpro.dojo.model.Cell;
-import de.cofinpro.dojo.model.Position;
-import de.cofinpro.dojo.model.VisibleCell;
+import de.cofinpro.dojo.logic.GameController;
+import de.cofinpro.dojo.logic.InvalidActionException;
+import de.cofinpro.dojo.logic.InvalidGameSetupException;
+import de.cofinpro.dojo.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +25,8 @@ public class MinesweeperRESTService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-//    @Inject
-//    private MineService mineService;
+    @Inject
+    private GameController gameController;
 
 /*
     @Inject
@@ -38,18 +38,29 @@ public class MinesweeperRESTService {
 */
     @PUT
     @Path("/submitAction/{sessid}")
-    public Collection<VisibleCell> submitAction( @PathParam("sessid") String sessionId, Action action ) {
-        return new ArrayList<VisibleCell>(){{
-            add( new VisibleCell( new Cell( new Position(1,1))) );
-            add( new VisibleCell( new Cell( new Position(1,1))) );
-            add( new VisibleCell( new Cell( new Position(1,1))) );
-        }};
+    public ActionResult submitAction( @PathParam("sessid") Integer sessionId, Action action ) {
+        try {
+            ActionResult result = gameController.submitAction(sessionId, action);
+            return result;
+        } catch (InvalidActionException e) {
+            logger.warn("Could NOT process action. " + e.getLocalizedMessage());
+        } finally {
+        }
+        return null;
     }
 
     @POST
     @Path("/initGame")
-    public String initGame() {
-        return "43";
+    public Integer initGame( InitGameRequest request ) {
+        try {
+            int id = gameController.startGame( request.getWidth(), request.getHeight(), request.getMineRatio() );
+            logger.info("New game with id <" + id + "> started.");
+            return id;
+        } catch (InvalidGameSetupException e) {
+            logger.warn("Could NOT start new game. " + e.getLocalizedMessage() );
+        } finally {
+        }
+        return null;
     }
 
     @GET
