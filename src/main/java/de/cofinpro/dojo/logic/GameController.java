@@ -17,11 +17,15 @@ public class GameController {
 
     private static final Logger LOG = LoggerFactory.getLogger(GameController.class);
 
-    private Map<Integer, Minefield> minefield;
+    private Map<Integer, Minefield> minefields;
 
     @PostConstruct
     protected void setupMinefields() {
-        minefield = new HashMap<>();
+        minefields = new HashMap<>();
+
+        //developer backdoor
+        Minefield minefield = new Minefield(10, 10, 20);
+        this.minefields.put( 42 , minefield );
     }
 
     public Integer startGame(int width, int height, float mineRatio) throws InvalidGameSetupException {
@@ -34,7 +38,7 @@ public class GameController {
         int numberOfMines = Math.round((height * width) * mineRatio);
         Minefield minefield = new Minefield(width, height, numberOfMines);
 
-        this.minefield.put(sessionId, minefield);
+        this.minefields.put(sessionId, minefield);
 
         return sessionId;
     }
@@ -49,7 +53,7 @@ public class GameController {
 
         Minefield minefield = new Minefield(width, height, minePositions);
 
-        this.minefield.put(sessionId, minefield);
+        this.minefields.put(sessionId, minefield);
 
         return sessionId;
     }
@@ -57,80 +61,93 @@ public class GameController {
     private int generateSessionId() {
         Random random = new Random();
         int sessionId = random.nextInt();
-        while (minefield.containsKey(sessionId)) {
+        while (minefields.containsKey(sessionId)) {
             sessionId = random.nextInt();
         }
         return sessionId;
     }
 
     protected Minefield getMinefield(int sessionId) {
-        return minefield.get(sessionId);
+        return minefields.get(sessionId);
     }
 
     public ActionResult submitAction(Integer sessionId, Action action) throws InvalidActionException {
 
-        ActionResult.Status status = ActionResult.Status.CONTINUE;
+        Minefield.Status status = Minefield.Status.CONTINUE;
 
         Minefield minefield = getMinefield(sessionId);
         if (minefield == null) {
             throw new InvalidActionException("Session not found", action);
         }
+        if (action.getType() != Action.Type.NOOP) {
+            Position position = action.getPosition();
+            Cell selectedCell = minefield.getCell(position);
 
-        Position position = action.getPosition();
-        Cell selectedCell = minefield.getCell(position);
+            if (selectedCell == null) {
+                throw new InvalidActionException("Invalid position: " + position, action);
+            }
 
-        if (selectedCell == null) {
-            throw new InvalidActionException("Invalid position: " + position, action);
-        }
+            switch (action.getType()) {
+                case UNCOVER:
 
-        switch (action.getType()) {
-            case UNCOVER:
+                    LOG.info("Uncover action at " + position.toString());
 
-                LOG.info("Uncover action at " + position.toString());
-
-                if (!selectedCell.isUncovered()) {
-                    if (selectedCell.isMine()) {
-                        LOG.error("Game over!");
-                        status = ActionResult.Status.GAMEOVER;
-                    } else {
-                        LOG.info("Empty cell!");
-                        uncoverCell(minefield, selectedCell);
-                    }
-                }
-                break;
-            case FLAG:
-
-                LOG.info("Flag action at " + position.toString());
-
-                if (!selectedCell.isUncovered()) {
-                    selectedCell.toggleFlag();
-                } else {
-                    throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
-                }
-
-                break;
-            case SOLVE:
-
-                LOG.info("Solve action at " + position.toString());
-
-
-                if (selectedCell.isUncovered()) {
-
-                    try {
-                        Collection<Cell> adjacent = minefield.getAdjacent(selectedCell);
-                        long numberOfFlags = adjacent.stream().filter( c -> c.isFlagged()).count();
-                        if (numberOfFlags == selectedCell.getNumber()) {
-                            adjacent.stream().filter( c -> !c.isUncovered() && !c.isFlagged()).forEach( c -> uncoverCell(minefield, c));
+                    if (!selectedCell.isUncovered()) {
+                        if (selectedCell.isMine()) {
+                            LOG.error("Game over!");
+                            status = Minefield.Status.GAMEOVER;
+                        } else {
+                            LOG.info("Empty cell!");
+                            uncoverCell(minefield, selectedCell);
                         }
-                    } catch (MineUncoveredException e) {
-                        LOG.error(e.getMessage());
-                        status = ActionResult.Status.GAMEOVER;
                     }
-                }
+                    break;
+                case FLAG:
 
-                break;
+                    LOG.info("Flag action at " + position.toString());
+
+                    if (!selectedCell.isUncovered()) {
+                        selectedCell.toggleFlag();
+                    } else {
+                        throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
+                    }
+
+                    LOG.info("Flag action at " + position.toString());
+
+                    if (!selectedCell.isUncovered()) {
+                        selectedCell.toggleFlag();
+                    } else {
+                        throw new InvalidActionException("Cannot flag/unflag uncovered cell at position " + position, action);
+                    }
+
+                    break;
+                case SOLVE:
+
+                    LOG.info("Solve action at " + position.toString());
+
+
+                    if (selectedCell.isUncovered()) {
+
+                        try {
+                            Collection<Cell> adjacent = minefield.getAdjacent(selectedCell);
+                            long numberOfFlags = adjacent.stream().filter(c -> c.isFlagged()).count();
+                            if (numberOfFlags == selectedCell.getNumber()) {
+                                adjacent.stream().filter(c -> !c.isUncovered() && !c.isFlagged()).forEach(c -> uncoverCell(minefield, c));
+                            }
+                        } catch (MineUncoveredException e) {
+                            LOG.error(e.getMessage());
+                            status = Minefield.Status.GAMEOVER;
+                        }
+                    }
+
+                    break;
+            }
+        }
+        else {
+            LOG.debug("NOOP called for sessid " + sessionId );
         }
         Collection<Cell> cells = minefield.getCells();
+        minefield.setStatus(status); //sets the last known status
 
         return new ActionResult(cells.stream().map(VisibleCell::new).collect(Collectors.toList()), status);
     }

@@ -27,3 +27,19 @@ dependencies {
 war {
     from 'src/main/webapp' // adds a file-set to the root of the archive
 }
+
+task distribution << {
+    println "We build with version=$version"
+}
+
+task release(dependsOn: 'distribution') << {
+    println 'We release now'
+}
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (taskGraph.hasTask(release)) {
+        version = '1.0'
+    } else {
+        version = '1.0-SNAPSHOT'
+    }
+}

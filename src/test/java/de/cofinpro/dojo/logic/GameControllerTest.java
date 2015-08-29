@@ -77,7 +77,7 @@ public class GameControllerTest {
         action.setPosition(Position.at(0, 0));
         action.setType(Action.Type.UNCOVER);
         ActionResult actionResult = controller.submitAction(sessionId, action);
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
 
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
     }
@@ -115,7 +115,7 @@ public class GameControllerTest {
         action.setPosition(Position.at(1, 2));
         action.setType(Action.Type.UNCOVER);
         ActionResult actionResult = controller.submitAction(sessionId, action);
-        Assert.assertEquals(ActionResult.Status.GAMEOVER, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.GAMEOVER, actionResult.getStatus());
     }
 
     @Test(expected = InvalidActionException.class)
@@ -134,7 +134,7 @@ public class GameControllerTest {
         action.setPosition(Position.at(1, 2));
         action.setType(Action.Type.UNCOVER);
         ActionResult actionResult = controller.submitAction(123213, action);
-        Assert.assertEquals(ActionResult.Status.GAMEOVER, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.GAMEOVER, actionResult.getStatus());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class GameControllerTest {
         LOG.info(actionResult.toString());
         LOG.info(minefield.toString());
 
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
 
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
 
@@ -187,7 +187,7 @@ public class GameControllerTest {
         LOG.info(actionResult.toString());
         LOG.info(minefield.toString());
 
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
 
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
 
@@ -232,7 +232,7 @@ public class GameControllerTest {
         action.setType(Action.Type.FLAG);
         ActionResult actionResult = controller.submitAction(sessionId, action);
 
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
 
         VisibleCell[][] cells = new VisibleCell[5][5];
@@ -246,7 +246,7 @@ public class GameControllerTest {
 
         ActionResult actionResult2 = controller.submitAction(sessionId, action);
 
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult2.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult2.getStatus());
         Assert.assertEquals(25, actionResult2.getVisibleCells().size());
 
         VisibleCell[][] cells2 = new VisibleCell[5][5];
@@ -260,6 +260,26 @@ public class GameControllerTest {
         LOG.info(actionResult2.toString());
         LOG.info(minefield.toString());
 
+
+    }
+
+    @Test
+    public void testNOOPAction()throws InvalidGameSetupException, InvalidActionException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(1, 2));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action action = new Action();
+        action.setType(Action.Type.NOOP);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+
+        Assert.assertEquals( Minefield.Status.CONTINUE, actionResult.getStatus() );
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+        Assert.assertEquals(minefield, controller.getMinefield(sessionId));
 
     }
 
@@ -290,7 +310,7 @@ public class GameControllerTest {
         action.setType(Action.Type.SOLVE);
         ActionResult actionResult = controller.submitAction(sessionId, action);
 
-        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.CONTINUE, actionResult.getStatus());
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
 
         VisibleCell[][] cells = new VisibleCell[5][5];
@@ -331,7 +351,7 @@ public class GameControllerTest {
         ActionResult unconverResult = controller.submitAction(sessionId, uncoverAction);
 
         Action flagAction = new Action();
-        flagAction.setPosition(Position.at(1,0));
+        flagAction.setPosition(Position.at(1, 0));
         flagAction.setType(Action.Type.FLAG);
         ActionResult flagResult = controller.submitAction(sessionId, flagAction);
 
@@ -342,7 +362,7 @@ public class GameControllerTest {
         action.setType(Action.Type.SOLVE);
         ActionResult actionResult = controller.submitAction(sessionId, action);
 
-        Assert.assertEquals(ActionResult.Status.GAMEOVER, actionResult.getStatus());
+        Assert.assertEquals(Minefield.Status.GAMEOVER, actionResult.getStatus());
         Assert.assertEquals(25, actionResult.getVisibleCells().size());
 
         VisibleCell[][] cells = new VisibleCell[5][5];

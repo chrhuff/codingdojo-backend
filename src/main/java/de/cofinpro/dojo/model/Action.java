@@ -9,7 +9,7 @@ public class Action {
     private Type type;
 
     public enum Type {
-        UNCOVER,FLAG,SOLVE
+        UNCOVER,FLAG,SOLVE,NOOP
     }
 
     public Action() {
