@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class GameControllerTest {
@@ -385,6 +386,99 @@ public class GameControllerTest {
         Assert.assertEquals(0, cells[2][0].getNumber());
         Assert.assertEquals(1, cells[2][1].getNumber());
         Assert.assertEquals(1, cells[2][2].getNumber());
+    }
+
+    @Test
+    public void testVictory() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(1, 1));
+        mines.add(Position.at(2, 2));
+
+        Integer sessionId = controller.startGame(3, 3, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncover = new Action();
+        uncover.setType(Action.Type.UNCOVER);
+
+        uncover.setPosition(Position.at(0, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(0, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(1, 0));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(1, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(2, 0));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(2, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.VICTORY);
+
+    }
+
+    @Test
+    public void testIgnoreActionsOnVictoryMinfield() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(1, 1));
+        mines.add(Position.at(2, 2));
+
+        Integer sessionId = controller.startGame(3, 3, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncover = new Action();
+        uncover.setType(Action.Type.UNCOVER);
+
+        uncover.setPosition(Position.at(0, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(0, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(1, 0));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(1, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(2, 0));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(2, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.VICTORY);
+
+        Collection<Cell> cellsBeforeUnwantedAction = controller.getMinefield(sessionId).getCells();
+        controller.submitAction( sessionId, uncover );
+        Assert.assertArrayEquals(cellsBeforeUnwantedAction.toArray(), controller.getMinefield(sessionId).getCells().toArray());
+    }
+
+    @Test
+    public void testIgnoreActionsOnGameOverMinfield() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(1, 1));
+        mines.add(Position.at(2, 2));
+
+        Integer sessionId = controller.startGame(3, 3, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncover = new Action();
+        uncover.setType(Action.Type.UNCOVER);
+
+        uncover.setPosition(Position.at(0, 0));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.GAMEOVER);
+
+        Collection<Cell> cellsBeforeUnwantedAction = controller.getMinefield(sessionId).getCells();
+        controller.submitAction(sessionId, uncover);
+        Assert.assertArrayEquals( cellsBeforeUnwantedAction.toArray() , controller.getMinefield(sessionId).getCells().toArray() );
     }
 
     @AfterClass

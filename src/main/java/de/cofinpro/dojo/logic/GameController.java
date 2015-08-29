@@ -79,7 +79,7 @@ public class GameController {
         if (minefield == null) {
             throw new InvalidActionException("Session not found", action);
         }
-        if (action.getType() != Action.Type.NOOP) {
+        if (action.getType() != Action.Type.NOOP && minefield.getStatus() == Minefield.Status.CONTINUE ) {
             Position position = action.getPosition();
             Cell selectedCell = minefield.getCell(position);
 
@@ -136,12 +136,30 @@ public class GameController {
             }
         }
         else {
-            LOG.debug("NOOP called for sessid " + sessionId );
+            LOG.debug("Either minefield was finished or NOOP called for sessid " + sessionId );
+            status = minefield.getStatus();
         }
         Collection<Cell> cells = minefield.getCells();
         minefield.setStatus(status); //sets the last known status
 
+        checkVictory(minefield);
+
         return new ActionResult(cells.stream().map(VisibleCell::new).collect(Collectors.toList()), status);
+    }
+
+    private void checkVictory( Minefield minefield) {
+        if (minefield.getStatus() == Minefield.Status.CONTINUE) {
+            Collection<Cell> cells = minefield.getCells();
+            //if all fields without mine are uncovered -> VICTORY
+            Iterator<Cell> it = cells.iterator();
+            while ( it.hasNext() ) {
+                Cell cell = it.next();
+                if (!cell.isUncovered() && !cell.isMine()) {
+                    return;
+                }
+            }
+            minefield.setStatus(Minefield.Status.VICTORY);
+        }
     }
 
     private void uncoverCell(Minefield minefield, Cell selectedCell) {
