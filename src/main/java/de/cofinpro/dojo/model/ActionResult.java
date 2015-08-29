@@ -10,15 +10,11 @@ import java.util.List;
  */
 public class ActionResult {
 
-    public enum Status {
-        CONTINUE, GAMEOVER, VICTORY
-    }
-
     private final List<VisibleCell> visibleCells = new ArrayList<>();
 
-    private final Status status;
+    private final Minefield.Status status;
 
-    public ActionResult(List<VisibleCell> visibleCells, Status status) {
+    public ActionResult(List<VisibleCell> visibleCells, Minefield.Status status) {
         this.visibleCells.addAll(visibleCells);
         this.status = status;
     }
@@ -27,7 +23,7 @@ public class ActionResult {
         return visibleCells;
     }
 
-    public Status getStatus() {
+    public Minefield.Status getStatus() {
         return status;
     }
 

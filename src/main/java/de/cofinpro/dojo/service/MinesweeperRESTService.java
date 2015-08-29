@@ -53,11 +53,25 @@ public class MinesweeperRESTService {
     @Path("/initGame")
     public Integer initGame( InitGameRequest request ) {
         try {
-            int id = gameController.startGame( request.getWidth(), request.getHeight(), request.getMineRatio() );
+            int id = gameController.startGame(request.getWidth(), request.getHeight(), request.getMineRatio());
             logger.info("New game with id <" + id + "> started.");
             return id;
         } catch (InvalidGameSetupException e) {
             logger.warn("Could NOT start new game. " + e.getLocalizedMessage() );
+        } finally {
+        }
+        return null;
+    }
+
+    @GET
+    @Path("/currentGameState/{sessid}")
+    public ActionResult getCurrentGameState(@PathParam("sessid") Integer sessionId) {
+        Action noop = new Action();
+        noop.setType(Action.Type.NOOP);
+        try {
+            return gameController.submitAction(sessionId,noop);
+        } catch (InvalidActionException e) {
+            logger.warn("Could NOT retrieve. " + e.getLocalizedMessage());
         } finally {
         }
         return null;
