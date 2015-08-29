@@ -10,6 +10,12 @@ public class Minefield {
 
     private Map<Position, Cell> cells;
 
+    private Status status;
+
+    public enum Status {
+        CONTINUE, GAMEOVER, VICTORY
+    }
+
     /**
      * Create a Minefield with a given number of mines
      *
@@ -20,6 +26,7 @@ public class Minefield {
     public Minefield(int width, int height, int numberOfMines) {
         this(width, height);
         setMines(randomize(numberOfMines));
+        setStatus(Status.CONTINUE);
     }
 
     /**
@@ -32,6 +39,15 @@ public class Minefield {
     public Minefield(int width, int height, Collection<Position> minePositions) {
         this(width, height);
         setMines(minePositions);
+        setStatus(Status.CONTINUE);
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     private Minefield(int width, int height) {
