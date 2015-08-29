@@ -51,4 +51,8 @@ public class Cell {
     public void setNumber(int number) {
         state.number = number;
     }
+
+    public void toggleFlag() {
+        state.flagged = !state.flagged;
+    }
 }

@@ -128,6 +128,8 @@ public class GameControllerTest {
 
         Integer sessionId = controller.startGame(5, 5, mines);
 
+        LOG.info("SessionId was " + sessionId);
+
         Action action = new Action();
         action.setPosition(Position.at(1, 2));
         action.setType(Action.Type.UNCOVER);
@@ -165,6 +167,100 @@ public class GameControllerTest {
         Assert.assertEquals(0, cells[4][0].getNumber());
         Assert.assertEquals(0, cells[3][0].getNumber());
         Assert.assertEquals(1, cells[4][1].getNumber());
+    }
+
+    @Test
+    public void testSetFlag() throws InvalidGameSetupException, InvalidActionException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(1, 2));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action action = new Action();
+        action.setPosition(Position.at(1, 2));
+        action.setType(Action.Type.FLAG);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+
+        LOG.info(actionResult.toString());
+        LOG.info(minefield.toString());
+
+        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+
+        VisibleCell[][] cells = new VisibleCell[5][5];
+        for (VisibleCell cell : actionResult.getVisibleCells()) {
+            cells[cell.getX()][cell.getY()] = cell;
+        }
+
+        Assert.assertEquals(true, cells[1][2].isFlagged());
+    }
+
+    @Test(expected = InvalidActionException.class)
+    public void testInvalidFlag() throws InvalidGameSetupException, InvalidActionException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(1, 2));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+
+        Action action = new Action();
+        action.setPosition(Position.at(-1, 2));
+        action.setType(Action.Type.FLAG);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+        Assert.assertNotNull(actionResult);
+
+        Assert.fail();
+    }
+
+    @Test
+    public void testToggleFlag() throws InvalidGameSetupException, InvalidActionException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(1, 2));
+        mines.add(Position.at(3, 2));
+        mines.add(Position.at(4, 4));
+
+        Integer sessionId = controller.startGame(5, 5, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action action = new Action();
+        action.setPosition(Position.at(1, 2));
+        action.setType(Action.Type.FLAG);
+        ActionResult actionResult = controller.submitAction(sessionId, action);
+
+        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult.getStatus());
+        Assert.assertEquals(25, actionResult.getVisibleCells().size());
+
+        VisibleCell[][] cells = new VisibleCell[5][5];
+        for (VisibleCell cell : actionResult.getVisibleCells()) {
+            cells[cell.getX()][cell.getY()] = cell;
+        }
+
+        Assert.assertEquals(true, cells[1][2].isFlagged());
+
+        LOG.info(actionResult.toString());
+
+        ActionResult actionResult2 = controller.submitAction(sessionId, action);
+
+        Assert.assertEquals(ActionResult.Status.CONTINUE, actionResult2.getStatus());
+        Assert.assertEquals(25, actionResult2.getVisibleCells().size());
+
+        VisibleCell[][] cells2 = new VisibleCell[5][5];
+        for (VisibleCell cell : actionResult.getVisibleCells()) {
+            cells2[cell.getX()][cell.getY()] = cell;
+        }
+
+        Assert.assertEquals(false, cells[1][2].isFlagged());
+
+
+        LOG.info(actionResult2.toString());
+        LOG.info(minefield.toString());
+
+
     }
 
     @AfterClass
