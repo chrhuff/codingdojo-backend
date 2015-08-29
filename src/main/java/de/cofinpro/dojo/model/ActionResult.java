@@ -42,7 +42,7 @@ public class ActionResult {
 
         String[][] fieldView = new String[height][width];
         for (VisibleCell visibleCell : visibleCells) {
-            fieldView[visibleCell.getY()][visibleCell.getX()] = "[" + (Boolean.TRUE.equals(visibleCell.isMine()) ? "M" : visibleCell.getNumber()) + "]";
+            fieldView[visibleCell.getY()][visibleCell.getX()] = "[" + (Boolean.TRUE.equals(visibleCell.isMine()) ? "M" : visibleCell.isFlagged() ? "F" : visibleCell.getNumber()) + "]";
         }
 
         for (int j = 0; j < width; j++) {
