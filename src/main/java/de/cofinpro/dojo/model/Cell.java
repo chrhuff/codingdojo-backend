@@ -32,7 +32,6 @@ public class Cell {
         return state.flagged;
     }
 
-    @JsonIgnore
     public boolean isMine() {
         return state.mine;
     }
@@ -42,14 +41,14 @@ public class Cell {
     }
 
     public int getNumber() {
-        if (state.uncovered) {
-            return state.number;
-        }
-        return -1;
+        return state.number;
     }
 
     public void uncover() {
         state.uncovered = true;
     }
 
+    public void setNumber(int number) {
+        state.number = number;
+    }
 }

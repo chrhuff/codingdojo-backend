@@ -12,6 +12,7 @@ public class Minefield {
 
     /**
      * Create a Minefield with a given number of mines
+     *
      * @param width
      * @param height
      * @param numberOfMines
@@ -23,6 +24,7 @@ public class Minefield {
 
     /**
      * Create a Minefield with a collection of pre-defined mine positions.
+     *
      * @param width
      * @param height
      * @param minePositions
@@ -32,7 +34,7 @@ public class Minefield {
         setMines(minePositions);
     }
 
-    public Minefield(int width, int height) {
+    private Minefield(int width, int height) {
         this.width = width;
         this.height = height;
 
@@ -40,7 +42,7 @@ public class Minefield {
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                Position position = new Position(j, i);
+                Position position = Position.at(j, i);
                 cells.put(position, new Cell(position));
             }
         }
@@ -56,7 +58,7 @@ public class Minefield {
 
             int x = random.nextInt(width);
             int y = random.nextInt(height);
-            Position position = new Position(x, y);
+            Position position = Position.at(x, y);
             if (!positionSet.contains(position)) {
                 positionSet.add(position);
                 minesSet++;
@@ -66,12 +68,40 @@ public class Minefield {
         return positionSet;
     }
 
-    public final void setMines(Collection<Position> minePositions) {
+    public Collection<Cell> getAdjacent(Cell cell) {
+        Position position = cell.position;
+        List<Cell> adjacent = new ArrayList<>();
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                int x1 = position.x - j;
+                int y1 = position.y - i;
+                Position adjacentPos = Position.at(x1, y1);
+                Cell adjacentCell = getCell(adjacentPos);
+                if (!adjacentPos.equals(position) && null != adjacentCell) {
+                    adjacent.add(adjacentCell);
+                }
+            }
+        }
+        return adjacent;
+    }
+
+    private void setMines(Collection<Position> minePositions) {
         for (Position position : minePositions) {
             Cell cell = cells.get(position);
             if (cell != null && !cell.isMine()) {
                 cell.setMine();
             }
+        }
+        for (Map.Entry<Position, Cell> entry : cells.entrySet()) {
+            Cell cell = entry.getValue();
+            int number = 0;
+            Collection<Cell> adjacentCells = getAdjacent(cell);
+            for (Cell adjacent : adjacentCells) {
+                if (adjacent != null && adjacent.isMine()) {
+                    number++;
+                }
+            }
+            cell.setNumber(number);
         }
     }
 
@@ -81,5 +111,20 @@ public class Minefield {
 
     public Cell getCell(Position position) {
         return cells.get(position);
+    }
+
+    @Override
+    public String toString() {
+        String fieldString = "\n";
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                Position pos = Position.at(j, i);
+                Cell cell1 = getCell(pos);
+                fieldString += "[" + (cell1.isMine() ? "M" : cell1.getNumber()) + "]";
+            }
+            fieldString += "\n";
+
+        }
+        return fieldString;
     }
 }

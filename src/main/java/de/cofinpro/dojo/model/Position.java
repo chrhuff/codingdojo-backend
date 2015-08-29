@@ -11,6 +11,10 @@ public class Position {
         this.y = y;
     }
 
+    public static Position at(int x, int y) {
+        return new Position(x, y);
+    }
+
     public Position() {
         this.x = -1;
         this.y = -1;

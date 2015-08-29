@@ -63,7 +63,7 @@ public class GameController {
         return sessionId;
     }
 
-    private Minefield getMinefield(int sessionId) {
+    protected Minefield getMinefield(int sessionId) {
         return minefield.get(sessionId);
     }
 
@@ -94,7 +94,7 @@ public class GameController {
                         status = ActionResult.Status.GAMEOVER;
                     } else {
                         LOG.info("Empty cell!");
-                        selectedCell.uncover();
+                        uncoverCell(minefield, selectedCell);
                     }
                 }
                 break;
@@ -106,5 +106,18 @@ public class GameController {
         Collection<Cell> cells = minefield.getCells();
 
         return new ActionResult(cells.stream().map(VisibleCell::new).collect(Collectors.toList()), status);
+    }
+
+    private void uncoverCell(Minefield minefield, Cell selectedCell) {
+        if (!selectedCell.isUncovered()) {
+            selectedCell.uncover();
+            if (selectedCell.getNumber() == 0) {
+                //uncover adjacent cells, now!
+                for (Cell adjacentCell : minefield.getAdjacent(selectedCell)) {
+                    uncoverCell(minefield, adjacentCell);
+                }
+
+            }
+        }
     }
 }
