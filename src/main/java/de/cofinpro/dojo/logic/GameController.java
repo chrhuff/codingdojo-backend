@@ -144,7 +144,7 @@ public class GameController {
 
         checkVictory(minefield);
 
-        return new ActionResult(cells.stream().map(VisibleCell::new).collect(Collectors.toList()), status);
+        return new ActionResult(cells.stream().map(VisibleCell::new).collect(Collectors.toList()), minefield.getStatus());
     }
 
     private void checkVictory( Minefield minefield) {

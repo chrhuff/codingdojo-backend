@@ -423,6 +423,52 @@ public class GameControllerTest {
     }
 
     @Test
+    public void testVictoryWithSolve() throws InvalidActionException, InvalidGameSetupException {
+        List<Position> mines = new ArrayList<>();
+        mines.add(Position.at(0, 0));
+        mines.add(Position.at(1, 1));
+        mines.add(Position.at(2, 2));
+
+        Integer sessionId = controller.startGame(3, 3, mines);
+        Minefield minefield = controller.getMinefield(sessionId);
+
+        Action uncover = new Action();
+        uncover.setType(Action.Type.UNCOVER);
+
+        uncover.setPosition(Position.at(0, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(0, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(1, 2));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        uncover.setPosition(Position.at(2, 1));
+        controller.submitAction(sessionId, uncover);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+
+        Action flag = new Action();
+        flag.setType(Action.Type.FLAG);
+        flag.setPosition(Position.at(0, 0));
+        controller.submitAction(sessionId, flag);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        flag.setPosition(Position.at(1, 1));
+        controller.submitAction(sessionId, flag);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+        flag.setPosition(Position.at(2, 2));
+        controller.submitAction(sessionId, flag);
+        Assert.assertEquals(minefield.getStatus(), Minefield.Status.CONTINUE);
+
+        Action solve = new Action();
+        solve.setType(Action.Type.SOLVE);
+        solve.setPosition(Position.at(2, 1));
+        ActionResult ar = controller.submitAction(sessionId, solve);
+        Assert.assertEquals(ar.getStatus(), Minefield.Status.VICTORY);
+
+    }
+
+    @Test
     public void testIgnoreActionsOnVictoryMinfield() throws InvalidActionException, InvalidGameSetupException {
         List<Position> mines = new ArrayList<>();
         mines.add(Position.at(0, 0));
